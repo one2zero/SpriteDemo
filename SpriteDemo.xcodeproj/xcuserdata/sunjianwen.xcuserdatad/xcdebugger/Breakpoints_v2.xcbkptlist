@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SpriteDemo/SpaceshipScene.m"
-            timestampString = "447248938.72235"
+            timestampString = "447249965.725679"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "226"
-            endingLineNumber = "226"
+            startingLineNumber = "222"
+            endingLineNumber = "222"
             landmarkName = "-motionBegan:withEvent:"
             landmarkType = "5">
          </BreakpointContent>

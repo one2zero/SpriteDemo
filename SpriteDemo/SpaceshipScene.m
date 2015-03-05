@@ -99,7 +99,9 @@ static const uint32_t rockCategory        =  0x1 << 2;
                                                  ]];
     [self runAction:[SKAction repeatActionForever:makeRocks]];
     
-    
+    SKEmitterNode *snow = [NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle] pathForResource:@"Snow" ofType:@"sks"]];
+    snow.position =CGPointMake(CGRectGetMidX(self.frame),CGRectGetMaxY(self.frame));
+    [self addChild:snow];
 }
 
 
