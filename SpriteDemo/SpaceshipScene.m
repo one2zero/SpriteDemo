@@ -101,6 +101,7 @@ static const uint32_t rockCategory        =  0x1 << 2;
     
     SKEmitterNode *snow = [NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle] pathForResource:@"Snow" ofType:@"sks"]];
     snow.position =CGPointMake(CGRectGetMidX(self.frame),CGRectGetMaxY(self.frame));
+    snow.particlePositionRange =CGVectorMake(CGRectGetMaxX(self.frame),CGRectGetMaxY(self.frame));
     [self addChild:snow];
 }
 
@@ -185,7 +186,9 @@ static const uint32_t rockCategory        =  0x1 << 2;
     SKEmitterNode *missile = [NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle] pathForResource:@"Boom" ofType:@"sks"]];
     missile.position = spaceship.position;
     missile.name = @"missile";
-    missile.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(32, 32)];
+    missile.xScale = 0.5;
+    missile.yScale = 0.5;
+    missile.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(16, 16)];
     missile.physicsBody.usesPreciseCollisionDetection = YES;
     missile.physicsBody.dynamic = YES;
     
@@ -249,6 +252,9 @@ static const uint32_t rockCategory        =  0x1 << 2;
     {
 //        [self attack: secondBody.node withMissile:firstBody.node];
         //石头装船
+        [firstBody.node removeFromParent];
+        [secondBody.node removeFromParent];
+        [self destoryAtX:firstBody.node.position.x Y:firstBody.node.position.y];
     }else if(firstBody.categoryBitMask == rockCategory && secondBody.categoryBitMask == missileCategory){
         //火箭炸石头
         [firstBody.node removeFromParent];
@@ -266,7 +272,6 @@ static const uint32_t rockCategory        =  0x1 << 2;
     SKEmitterNode *bomb=[NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle] pathForResource:@"Smoke" ofType:@"sks"]];
     bomb.position = CGPointMake(x, y);
     bomb.name=@"myBomb";
-    //发送粒子到场景。
     bomb.targetNode = [self scene];
     [self addChild:bomb];
     
@@ -274,6 +279,31 @@ static const uint32_t rockCategory        =  0x1 << 2;
     [bomb runAction:hide completion:^{
         [bomb removeFromParent];
     }];
+}
+
+-(void)destoryAtX:(CGFloat)x Y:(CGFloat)y{
+    SKEmitterNode *bomb=[NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle] pathForResource:@"Smoke" ofType:@"sks"]];
+    bomb.position = CGPointMake(x, y);
+    bomb.name=@"destory";
+    bomb.targetNode = [self scene];
+    [self addChild:bomb];
+    
+    SKAction *zoom = [SKAction scaleTo:2.0 duration:0.25];
+    SKAction *pause = [SKAction waitForDuration:0.5];
+    SKAction *fadeAway = [SKAction fadeOutWithDuration:0.25];
+    SKAction *remove = [SKAction removeFromParent];
+    SKAction * moveSequence = [SKAction sequence:@[ zoom, pause, fadeAway, remove]];
+    [bomb runAction:moveSequence completion:^{
+        [self endGame];
+    }];
+
+}
+
+-(void)endGame{
+    HelloScene *hello = [[HelloScene alloc] initWithSize:self.view.frame.size];
+    
+    SKTransition *doors= [SKTransition doorsCloseVerticalWithDuration:0.5];
+    [self.view presentScene:hello transition:doors];
 }
 
 @end

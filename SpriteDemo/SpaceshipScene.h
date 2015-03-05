@@ -9,6 +9,7 @@
 #import <SpriteKit/SpriteKit.h>
 #import "AppDelegate.h"
 #import <CoreMotion/CoreMotion.h>
+#import "HelloScene.h"
 
 @interface SpaceshipScene : SKScene<SKPhysicsContactDelegate>
 
