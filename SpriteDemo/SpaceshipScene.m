@@ -65,6 +65,7 @@ static const uint32_t rockCategory        =  0x1 << 2;
     }
 }
 
+#pragma mark ----refresh
 - (void)update:(NSTimeInterval)currentTime{
     
     [self processUserMotionForUpdate:currentTime];
@@ -83,6 +84,8 @@ static const uint32_t rockCategory        =  0x1 << 2;
     }
 }
 
+
+#pragma mark ---- creatations
 - (void)createSceneContents
 {
     self.backgroundColor = [SKColor grayColor];
@@ -94,10 +97,11 @@ static const uint32_t rockCategory        =  0x1 << 2;
     spaceship.position = CGPointMake(CGRectGetMidX(self.frame),0);
     [self addChild:spaceship];
     
-    SKAction * makeRocks = [SKAction sequence:@ [[SKAction performSelector:@selector(addRock) onTarget:self]
-                                                 ,[SKAction waitForDuration:1.0 withRange:0.15]
-                                                 ]];
-    [self runAction:[SKAction repeatActionForever:makeRocks]];
+    SKLabelNode *scoreNode = [self newScoreNode];
+    [self addChild:scoreNode];
+    
+    [self createRock];
+    
     
     SKEmitterNode *snow = [NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle] pathForResource:@"Snow" ofType:@"sks"]];
     snow.position =CGPointMake(CGRectGetMidX(self.frame),CGRectGetMaxY(self.frame));
@@ -142,7 +146,23 @@ static const uint32_t rockCategory        =  0x1 << 2;
     return light;
 }
 
+-(SKLabelNode *)newScoreNode{
+    SKLabelNode * scoreNode = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    scoreNode.text = @"0";
+    scoreNode.fontSize = 42;
+    scoreNode.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMaxY(self.frame));
+    scoreNode.name = @"score";
+    return scoreNode;
+}
 
+
+
+-(void)createRock{
+    SKAction * makeRocks = [SKAction sequence:@ [[SKAction performSelector:@selector(addRock) onTarget:self]
+                                                 ,[SKAction waitForDuration:1.0 withRange:0.15]
+                                                 ]];
+    [self runAction:[SKAction repeatActionForever:makeRocks]];
+}
 
 - (void)addRock
 {
@@ -165,13 +185,6 @@ static const uint32_t rockCategory        =  0x1 << 2;
     [self addChild:rock];
 }
 
--(void)didSimulatePhysics
-{
-    [self enumerateChildNodesWithName:@"rock" usingBlock:^(SKNode *node, BOOL *stop) {
-        if (node.position.y < 0)
-            [node removeFromParent];
-    }];
-}
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
     SKNode *spaceship = [self childNodeWithName:@"spaceship"];
@@ -221,8 +234,14 @@ static const uint32_t rockCategory        =  0x1 << 2;
     [missile runAction:[SKAction sequence:@[actionMove, actionMoveDone]]];
 }
 
-- (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event{
-    
+
+#pragma mark ---- Physics
+-(void)didSimulatePhysics
+{
+    [self enumerateChildNodesWithName:@"rock" usingBlock:^(SKNode *node, BOOL *stop) {
+        if (node.position.y < 0)
+            [node removeFromParent];
+    }];
 }
 
 - (void)didBeginContact:(SKPhysicsContact *)contact
